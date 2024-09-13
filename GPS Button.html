@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GPS Location Picker</title>
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Submit Your Location</h1>
+    <form id="location-form">
+        <input type="text" id="location" placeholder="Your Location" readonly>
+        <input type="hidden" id="lat" name="latitude">
+        <input type="hidden" id="lng" name="longitude">
+        <button type="button" onclick="getLocation()">Get My Location</button>
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        function showPosition(position) {
+            var lat = position.coords.latitude;
+            var lng = position.coords.longitude;
+
+            document.getElementById('lat').value = lat;
+            document.getElementById('lng').value = lng;
+
+            var location = "Latitude: " + lat + ", Longitude: " + lng;
+            document.getElementById('location').value = location;
+        }
+
+        function showError(error) {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("User denied the request for Geolocation.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("Location information is unavailable.");
+                    break;
+                case error.TIMEOUT:
+                    alert("The request to get user location timed out.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    alert("An unknown error occurred.");
+                    break;
+            }
+        }
+
+        document.getElementById('location-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var lat = document.getElementById('lat').value;
+            var lng = document.getElementById('lng').value;
+
+            fetch('YOUR_BACKEND_URL', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ latitude: lat, longitude: lng }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Location submitted successfully');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
